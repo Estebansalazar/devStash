@@ -1,5 +1,36 @@
 ## Current Feature
 
+Dashboard UI Phase 3: main area
+
+## Status
+
+Completed
+- 4 stats cards (items, collections, favorite items, favorite collections)
+- Recent collections, pinned items and 10 recent items in the main area
+- Theme toggle (sun/moon) in the top bar, dark by default and remembered
+- 4 extra mock items to fill the 10 recent items
+- Recent collections logic shared between sidebar and dashboard
+
+## Goals
+
+- 4 stats cards at the top: items, collections, favorite items, favorite collections (not in screenshot)
+- Recent collections
+- Pinned items
+- 10 recent items
+- Theme toggle (sun/moon icon) in the top bar for dark/light theme, dark by default
+
+## Notes
+
+- Spec: @Context/Features/dashboard-phase-3-spec.md
+- Screenshot: @Context/Screenshots/Devdash-dark.png
+- Use data from @src/lib/mock-data.ts (import directly until the database is implemented)
+- Mock data only has 6 items, so 4 more are added to fill the 10 recent items
+- Phase 3 of 3; see also @Context/Features/dashboard-phase-1-spec.md and @Context/Features/dashboard-phase-2-spec.md
+
+-----
+
+## Previous Feature
+
 Dashboard UI Phase 2: collapsible sidebar
 
 ## Status
@@ -26,38 +57,6 @@ Completed
 ## Notes
 
 - Spec: @Context/Features/dashboard-phase-2-spec.md
-- Screenshot: @Context/Screenshots/Devdash-dark.png
-- Use data from @src/lib/mock-data.ts (import directly until the database is implemented)
-- Phase 2 of 3; see also @Context/Features/dashboard-phase-1-spec.md and @Context/Features/dashboard-phase-3-spec.md
-
------
-
-## Previous Feature
-
-Dashboard UI Phase 1: base layout at /dashboard
-
-## Status
-
-Completed
-- ShadCN UI set up (button, input, kbd)
-- /dashboard route created with dark mode by default
-- Exact colors from the screenshot applied to the dark theme
-- Top bar with breadcrumb, search (⌘K) and New Item button (display only)
-- "Sidebar" placeholder
-- Main area with example data from mock data: 4 collection cards and 3 recent item cards
-
-## Goals
-
-- Set up ShadCN UI
-- Create /dashboard route with dark mode by default
-- Use the exact colors from the screenshot
-- Top bar with search and New Item button (display only)
-- "Sidebar" placeholder
-- Main area with example data from mock data (collections + 3 recent items)
-
-## Notes
-
-- Spec: @Context/Features/dashboard-phase-1-spec.md
 
 -----
 
@@ -66,3 +65,4 @@ Completed
 - Initial Next.js setup (Create Next App, Tailwind v4, boilerplate removed)
 - Dashboard UI Phase 1 (completed): ShadCN set up, /dashboard route in dark mode with the exact screenshot colors, top bar with search and New Item button, sidebar placeholder, and example collections and recent items from mock data
 - Dashboard UI Phase 2 (completed): collapsible sidebar with item type links, favorite and recent collections, user avatar area, and a drawer on mobile
+- Dashboard UI Phase 3 (completed): stats cards, recent collections, pinned items, 10 recent items and a dark/light theme toggle

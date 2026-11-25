@@ -1,6 +1,7 @@
 import { Plus, Search } from "lucide-react";
 
 import { SidebarToggle } from "@/components/layout/SidebarToggle";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Kbd } from "@/components/ui/kbd";
@@ -31,6 +32,7 @@ export function TopBar() {
           <Plus />
           New Item
         </Button>
+        <ThemeToggle />
       </div>
     </header>
   );
