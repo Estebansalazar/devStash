@@ -1,5 +1,6 @@
 import { Plus, Search } from "lucide-react";
 
+import { SidebarToggle } from "@/components/layout/SidebarToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Kbd } from "@/components/ui/kbd";
@@ -7,11 +8,14 @@ import { Kbd } from "@/components/ui/kbd";
 export function TopBar() {
   return (
     <header className="flex h-16 items-center justify-between gap-4 border-b px-6">
-      <nav className="flex items-center gap-2 text-sm">
-        <span className="text-muted-foreground">Workspace</span>
-        <span className="text-muted-foreground">/</span>
-        <span className="font-medium">Dashboard</span>
-      </nav>
+      <div className="flex items-center gap-3">
+        <SidebarToggle />
+        <nav className="flex items-center gap-2 text-sm">
+          <span className="text-muted-foreground">Workspace</span>
+          <span className="text-muted-foreground">/</span>
+          <span className="font-medium">Dashboard</span>
+        </nav>
+      </div>
 
       <div className="flex flex-1 items-center justify-end gap-3">
         <div className="relative w-full max-w-sm">
