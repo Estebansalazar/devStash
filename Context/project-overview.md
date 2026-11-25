@@ -1,350 +1,370 @@
-# DevStash — Project Overview
+# DevStash - Project Overview
 
-> One fast, searchable, AI-enhanced hub for all developer knowledge and resources.
-
----
-
-## 1. Problem
-
-Developers keep their essentials scattered across too many places:
-
-| What | Where it usually lives |
-|---|---|
-| Code snippets | VS Code, Notion |
-| AI prompts | Chat histories |
-| Context files | Buried in project folders |
-| Useful links | Browser bookmarks |
-| Docs | Random folders |
-| Commands | `.txt` files, bash history |
-| Project templates | GitHub Gists |
-
-The result: context switching, lost knowledge, and inconsistent workflows. **DevStash** replaces all of that with a single hub.
+> A unified hub for developer knowledge & resources
 
 ---
 
-## 2. Target Users
+## 📋 Table of Contents
 
-| Persona | Primary need |
-|---|---|
-| **Everyday Developer** | Grab snippets, prompts, commands, and links fast |
-| **AI-first Developer** | Save prompts, context files, workflows, system messages |
-| **Content Creator / Educator** | Store code blocks, explanations, course notes |
-| **Full-stack Builder** | Collect patterns, boilerplates, API examples |
+- [Problem Statement](#-problem-statement)
+- [Target Users](#-target-users)
+- [Features](#-features)
+- [Data Architecture](#-data-architecture)
+- [Tech Stack](#-tech-stack)
+- [Monetization](#-monetization)
+- [UI/UX Guidelines](#-uiux-guidelines)
 
 ---
 
-## 3. Features
+## 🎯 Problem Statement
 
-Legend: 🆓 Free · ⭐ Pro · 🔜 Later
+Developers keep their essentials scattered across multiple tools and locations:
+
+| Resource      | Common Location          |
+| ------------- | ------------------------ |
+| Code snippets | VS Code, Notion, Gists   |
+| AI prompts    | Chat histories           |
+| Context files | Buried in projects       |
+| Useful links  | Browser bookmarks        |
+| Documentation | Random folders           |
+| Commands      | .txt files, bash history |
+| Templates     | GitHub Gists             |
+
+**The Result:** Context switching, lost knowledge, and inconsistent workflows.
+
+**The Solution:** DevStash provides ONE fast, searchable, AI-enhanced hub for all developer knowledge & resources.
+
+---
+
+## 👥 Target Users
+
+| User Type                      | Primary Needs                                      |
+| ------------------------------ | -------------------------------------------------- |
+| **Everyday Developer**         | Fast access to snippets, prompts, commands, links  |
+| **AI-First Developer**         | Save prompts, contexts, workflows, system messages |
+| **Content Creator / Educator** | Store code blocks, explanations, course notes      |
+| **Full-Stack Builder**         | Collect patterns, boilerplates, API examples       |
+
+---
+
+## ✨ Features
 
 ### A. Items & Item Types
 
-Every item has exactly one type. System types are seeded and **cannot be edited or deleted**. Custom types come later (🔜 ⭐).
+Items are the core unit of DevStash. Each item has a type that determines its behavior and appearance.
 
-| Type | Content kind | Route | Color | Icon | Tier |
-|---|---|---|---|---|---|
-| Snippet | `TEXT` | `/items/snippets` | ![#3b82f6](https://placehold.co/12x12/3b82f6/3b82f6.png) `#3b82f6` blue | [`Code`](https://lucide.dev/icons/code) | 🆓 |
-| Prompt | `TEXT` | `/items/prompts` | ![#8b5cf6](https://placehold.co/12x12/8b5cf6/8b5cf6.png) `#8b5cf6` purple | [`Sparkles`](https://lucide.dev/icons/sparkles) | 🆓 |
-| Command | `TEXT` | `/items/commands` | ![#f97316](https://placehold.co/12x12/f97316/f97316.png) `#f97316` orange | [`Terminal`](https://lucide.dev/icons/terminal) | 🆓 |
-| Note | `TEXT` | `/items/notes` | ![#fde047](https://placehold.co/12x12/fde047/fde047.png) `#fde047` yellow | [`StickyNote`](https://lucide.dev/icons/sticky-note) | 🆓 |
-| Link | `URL` | `/items/links` | ![#10b981](https://placehold.co/12x12/10b981/10b981.png) `#10b981` emerald | [`Link`](https://lucide.dev/icons/link) | 🆓 |
-| File | `FILE` | `/items/files` | ![#6b7280](https://placehold.co/12x12/6b7280/6b7280.png) `#6b7280` gray | [`File`](https://lucide.dev/icons/file) | ⭐ |
-| Image | `FILE` | `/items/images` | ![#ec4899](https://placehold.co/12x12/ec4899/ec4899.png) `#ec4899` pink | [`Image`](https://lucide.dev/icons/image) | ⭐ |
+#### System Types (Immutable)
 
-Items open and are created inside a **drawer** for fast access without leaving the current view.
+| Type       | Icon         | Color               | Content Type | Route             |
+| ---------- | ------------ | ------------------- | ------------ | ----------------- |
+| 🔷 Snippet | `Code`       | `#3b82f6` (blue)    | Text         | `/items/snippets` |
+| 🟣 Prompt  | `Sparkles`   | `#8b5cf6` (purple)  | Text         | `/items/prompts`  |
+| 🟠 Command | `Terminal`   | `#f97316` (orange)  | Text         | `/items/commands` |
+| 🟡 Note    | `StickyNote` | `#fde047` (yellow)  | Text         | `/items/notes`    |
+| ⚫ File    | `File`       | `#6b7280` (gray)    | File         | `/items/files`    |
+| 🩷 Image   | `Image`      | `#ec4899` (pink)    | File         | `/items/images`   |
+| 🟢 Link    | `Link`       | `#10b981` (emerald) | URL          | `/items/links`    |
+
+> **Note:** File and Image types are Pro-only features.
 
 ### B. Collections
 
-- A collection can hold items of **any type**.
-- An item can belong to **multiple collections** (many-to-many via `ItemCollection`).
-- Examples: *React Patterns* (snippets, notes), *Context Files* (files), *Python Snippets* (snippets), *Interview Prep* (mixed).
+Users can organize items into collections. Items support many-to-many relationships with collections.
+
+**Examples:**
+
+- React Patterns (snippets, notes)
+- Context Files (files)
+- Python Snippets (snippets)
+- Interview Prep (mixed types)
 
 ### C. Search
 
-Search across **title, content, tags, and type**. Free tier gets basic search; the "powerful" version (ranking, fuzzy matching) is the upgrade path. See [Open Questions](#12-open-questions).
+Powerful search across:
+
+- Content
+- Tags
+- Titles
+- Types
 
 ### D. Authentication
 
-- Email + password (Credentials provider)
-- GitHub OAuth
+- Email/password authentication
+- GitHub OAuth sign-in
+- Powered by NextAuth v5
 
 ### E. Core Features
 
-- [ ] Favorite collections and items
-- [ ] Pin items to top
-- [ ] Recently used items
-- [ ] Import code from a file
-- [ ] Markdown editor for text types
-- [ ] File upload for file types ⭐
-- [ ] Export data (JSON / ZIP) ⭐
-- [ ] Dark mode by default, light mode optional
-- [ ] Add/remove an item to/from multiple collections
-- [ ] See which collections an item belongs to
+- ⭐ Collection and item favorites
+- 📌 Pin items to top
+- 🕐 Recently used items
+- 📥 Import code from file
+- ✍️ Markdown editor for text types
+- 📤 File upload for file types
+- 💾 Export data (JSON/ZIP)
+- 🌙 Dark mode (default)
+- 🏷️ Multi-collection item assignment
+- 👁️ View item's collection memberships
 
-### F. AI Features ⭐
+### F. AI Features (Pro Only)
 
-| Feature | Applies to |
-|---|---|
-| Auto-tag suggestions | All text items |
-| Summaries | Notes, long snippets, files |
-| Explain This Code | Snippets, commands |
-| Prompt optimizer | Prompts |
-
-Model: OpenAI `gpt-5-nano`.
+- 🤖 AI auto-tag suggestions
+- 📝 AI summaries
+- 💡 AI "Explain This Code"
+- ⚡ Prompt optimizer
 
 ---
 
-## 4. Tech Stack
+## 🗄️ Data Architecture
 
-| Layer | Choice | Docs |
-|---|---|---|
-| Framework | Next.js 16 / React 19 (App Router, SSR + client components) | [nextjs.org/docs](https://nextjs.org/docs) |
-| Language | TypeScript | [typescriptlang.org](https://www.typescriptlang.org/docs/) |
-| Database | Neon (serverless PostgreSQL) | [neon.com/docs](https://neon.com/docs) |
-| ORM | Prisma 7 | [prisma.io/docs](https://www.prisma.io/docs) |
-| Auth | NextAuth / Auth.js v5 + Prisma adapter | [authjs.dev](https://authjs.dev) |
-| File storage | Cloudflare R2 | [developers.cloudflare.com/r2](https://developers.cloudflare.com/r2/) |
-| AI | OpenAI `gpt-5-nano` | [platform.openai.com/docs](https://platform.openai.com/docs) |
-| Payments | Stripe | [docs.stripe.com](https://docs.stripe.com) |
-| Styling | Tailwind CSS v4 + shadcn/ui | [tailwindcss.com](https://tailwindcss.com/docs) · [ui.shadcn.com](https://ui.shadcn.com) |
-| Icons | Lucide | [lucide.dev](https://lucide.dev) |
-| Cache | Redis (optional, only if needed) | — |
-
-**Principles:** one repo, one codebase. Backend logic lives in Route Handlers (`app/api/*`) for item CRUD, file uploads, AI calls, and Stripe webhooks.
-
----
-
-## 5. Architecture
-
-```mermaid
-flowchart LR
-    U[Browser] --> N[Next.js 16 App<br/>RSC pages + client components]
-    N --> API[Route Handlers<br/>app/api/*]
-    N --> AUTH[Auth.js v5]
-    API --> P[Prisma Client 7<br/>+ driver adapter]
-    AUTH --> P
-    P --> DB[(Neon PostgreSQL)]
-    API -->|presigned PUT / GET| R2[(Cloudflare R2)]
-    U -.->|direct upload via presigned URL| R2
-    API --> AI[OpenAI gpt-5-nano]
-    API <-->|checkout + webhooks| S[Stripe]
-    API -.->|optional| R[(Redis)]
-```
-
-### File upload flow (⭐)
-
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant A as /api/uploads
-    participant R2 as Cloudflare R2
-    participant DB as Neon
-    C->>A: Request upload (fileName, size, mimeType)
-    A->>A: Check auth, Pro gate, size limit
-    A-->>C: Presigned PUT URL + object key
-    C->>R2: PUT file
-    C->>A: Create item (fileKey, fileName, fileSize)
-    A->>DB: INSERT Item
-```
-
----
-
-## 6. Data Model
-
-### Entity relationships
+### Entity Relationship Diagram
 
 ```mermaid
 erDiagram
-    USER ||--o{ ACCOUNT : has
-    USER ||--o{ SESSION : has
-    USER ||--o{ ITEM : owns
-    USER ||--o{ COLLECTION : owns
-    USER ||--o{ TAG : owns
-    USER |o--o{ ITEM_TYPE : "owns (null = system)"
-    ITEM_TYPE ||--o{ ITEM : classifies
-    ITEM_TYPE |o--o{ COLLECTION : "default type"
-    ITEM ||--o{ ITEM_COLLECTION : in
-    COLLECTION ||--o{ ITEM_COLLECTION : contains
-    ITEM }o--o{ TAG : tagged
+    USER ||--o{ ITEM : creates
+    USER ||--o{ COLLECTION : creates
+    USER ||--o{ ITEMTYPE : creates
+    ITEM ||--o{ ITEMCOLLECTION : belongs_to
+    COLLECTION ||--o{ ITEMCOLLECTION : contains
+    ITEM }o--|| ITEMTYPE : has_type
+    ITEM }o--o{ TAG : tagged_with
+    COLLECTION }o--o| ITEMTYPE : has_default_type
+
+    USER {
+        string id PK
+        string email
+        string name
+        boolean isPro
+        string stripeCustomerId
+        string stripeSubscriptionId
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    ITEM {
+        string id PK
+        string title
+        enum contentType
+        text content
+        string fileUrl
+        string fileName
+        int fileSize
+        string url
+        string description
+        boolean isFavorite
+        boolean isPinned
+        string language
+        datetime createdAt
+        datetime updatedAt
+        string userId FK
+        string itemTypeId FK
+    }
+
+    ITEMTYPE {
+        string id PK
+        string name
+        string icon
+        string color
+        boolean isSystem
+        string userId FK
+    }
+
+    COLLECTION {
+        string id PK
+        string name
+        string description
+        boolean isFavorite
+        string defaultTypeId FK
+        datetime createdAt
+        datetime updatedAt
+        string userId FK
+    }
+
+    ITEMCOLLECTION {
+        string itemId FK
+        string collectionId FK
+        datetime addedAt
+    }
+
+    TAG {
+        string id PK
+        string name
+    }
 ```
 
-### Prisma schema (`prisma/schema.prisma`)
-
-Written for Prisma 7: `prisma-client` generator with a required `output`, and the connection URL lives in `prisma.config.ts` instead of the schema.
+### Prisma Schema
 
 ```prisma
+// prisma/schema.prisma
+
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// ─────────────────────────────────────────────
-// Enums
-// ─────────────────────────────────────────────
-
-enum ContentType {
-  TEXT // snippet, prompt, note, command
-  URL  // link
-  FILE // file, image
-}
-
-// ─────────────────────────────────────────────
-// Auth (Auth.js v5 Prisma adapter models + app fields)
-// ─────────────────────────────────────────────
-
+// ============================================
+// USER
+// ============================================
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  passwordHash  String? // null for OAuth-only users
+  id                   String       @id @default(cuid())
+  email                String       @unique
+  emailVerified        DateTime?
+  name                 String?
+  image                String?
+  password             String?
+  isPro                Boolean      @default(false)
+  stripeCustomerId     String?      @unique
+  stripeSubscriptionId String?      @unique
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
 
-  // Billing
-  isPro                Boolean @default(false)
-  stripeCustomerId     String? @unique
-  stripeSubscriptionId String? @unique
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  // Relations
+  items       Item[]
+  collections Collection[]
+  itemTypes   ItemType[]
   accounts    Account[]
   sessions    Session[]
-  items       Item[]
-  itemTypes   ItemType[]
-  collections Collection[]
-  tags        Tag[]
+
+  @@map("users")
 }
 
+// ============================================
+// NEXTAUTH MODELS
+// ============================================
 model Account {
+  id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
 model Session {
+  id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
 }
 
 model VerificationToken {
   identifier String
-  token      String
+  token      String   @unique
   expires    DateTime
 
-  @@id([identifier, token])
+  @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
-// ─────────────────────────────────────────────
-// Domain
-// ─────────────────────────────────────────────
-
-model ItemType {
-  id          String      @id @default(cuid())
-  name        String // "Snippet"
-  slug        String // "snippets" → /items/snippets
-  icon        String // Lucide icon name, e.g. "Code"
-  color       String // hex, e.g. "#3b82f6"
-  contentType ContentType
-  isSystem    Boolean     @default(false)
-  isProOnly   Boolean     @default(false)
-
-  userId String? // null for system types
-  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  items                 Item[]
-  defaultForCollections Collection[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([userId, slug])
+// ============================================
+// ITEM
+// ============================================
+enum ContentType {
+  TEXT
+  FILE
+  URL
 }
 
 model Item {
-  id          String  @id @default(cuid())
+  id          String      @id @default(cuid())
   title       String
-  description String?
+  contentType ContentType
+  content     String?     @db.Text // For TEXT types
+  fileUrl     String?     // R2 URL for FILE types
+  fileName    String?     // Original filename
+  fileSize    Int?        // Size in bytes
+  url         String?     // For URL/link types
+  description String?     @db.Text
+  isFavorite  Boolean     @default(false)
+  isPinned    Boolean     @default(false)
+  language    String?     // Programming language for syntax highlighting
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
-  // TEXT types
-  content  String?
-  language String? // for syntax highlighting, e.g. "typescript"
-
-  // URL types
-  url String?
-
-  // FILE types
-  fileKey  String? // R2 object key (not a public URL)
-  fileName String? // original filename
-  fileSize Int? // bytes
-  mimeType String?
-
-  isFavorite Boolean   @default(false)
-  isPinned   Boolean   @default(false)
-  lastUsedAt DateTime? // powers "Recently used"
-
+  // Relations
   userId     String
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   itemTypeId String
-  itemType   ItemType @relation(fields: [itemTypeId], references: [id], onDelete: Restrict)
+  itemType   ItemType @relation(fields: [itemTypeId], references: [id])
+  tags       Tag[]    @relation("ItemTags")
 
-  tags        Tag[]
+  // Many-to-many with collections
   collections ItemCollection[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId, itemTypeId])
-  @@index([userId, isPinned])
-  @@index([userId, lastUsedAt])
+  @@index([userId])
+  @@index([itemTypeId])
+  @@index([createdAt])
+  @@map("items")
 }
 
+// ============================================
+// ITEM TYPE
+// ============================================
+model ItemType {
+  id       String  @id @default(cuid())
+  name     String
+  icon     String
+  color    String
+  isSystem Boolean @default(false)
+
+  // Relations
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items  Item[]
+
+  // Collections that use this as default type
+  defaultForCollections Collection[]
+
+  @@unique([name, userId])
+  @@map("item_types")
+}
+
+// ============================================
+// COLLECTION
+// ============================================
 model Collection {
-  id          String  @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
-  description String?
-  isFavorite  Boolean @default(false)
+  description String?  @db.Text
+  isFavorite  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  // Used for card color when the collection has no items yet
+  // Relations
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   defaultTypeId String?
-  defaultType   ItemType? @relation(fields: [defaultTypeId], references: [id], onDelete: SetNull)
+  defaultType   ItemType? @relation(fields: [defaultTypeId], references: [id])
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  // Many-to-many with items
   items ItemCollection[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
   @@index([userId])
+  @@map("collections")
 }
 
+// ============================================
+// ITEM-COLLECTION JOIN TABLE
+// ============================================
 model ItemCollection {
   itemId       String
   collectionId String
@@ -354,207 +374,386 @@ model ItemCollection {
   collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 
   @@id([itemId, collectionId])
-  @@index([collectionId])
+  @@map("item_collections")
 }
 
+// ============================================
+// TAG
+// ============================================
 model Tag {
-  id     String @id @default(cuid())
-  name   String
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id    String @id @default(cuid())
+  name  String @unique
+  items Item[] @relation("ItemTags")
 
-  items Item[] // implicit many-to-many
-
-  @@unique([userId, name])
+  @@map("tags")
 }
 ```
 
-### Prisma 7 config (`prisma.config.ts`, project root)
+### Seed Data for System Types
 
-```ts
-import "dotenv/config";
-import { defineConfig, env } from "prisma/config";
+```typescript
+// prisma/seed.ts
 
-export default defineConfig({
-  schema: "prisma/schema.prisma",
-  migrations: {
-    path: "prisma/migrations",
-    seed: "tsx prisma/seed.ts",
-  },
-  datasource: {
-    // CLI (migrations) should use Neon's direct, non-pooled connection
-    url: env("DIRECT_URL"),
-  },
-});
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+const systemItemTypes = [
+  { name: 'snippet', icon: 'Code', color: '#3b82f6', isSystem: true },
+  { name: 'prompt', icon: 'Sparkles', color: '#8b5cf6', isSystem: true },
+  { name: 'command', icon: 'Terminal', color: '#f97316', isSystem: true },
+  { name: 'note', icon: 'StickyNote', color: '#fde047', isSystem: true },
+  { name: 'file', icon: 'File', color: '#6b7280', isSystem: true },
+  { name: 'image', icon: 'Image', color: '#ec4899', isSystem: true },
+  { name: 'link', icon: 'Link', color: '#10b981', isSystem: true },
+];
+
+async function main() {
+  console.log('Seeding system item types...');
+
+  for (const type of systemItemTypes) {
+    await prisma.itemType.upsert({
+      where: { name_userId: { name: type.name, userId: null } },
+      update: {},
+      create: type,
+    });
+  }
+
+  console.log('Seeding complete!');
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
 ```
-
-### Prisma client singleton (`src/lib/db.ts`)
-
-Prisma 7 requires a driver adapter for SQL databases.
-
-```ts
-import { PrismaClient } from "@/generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-
-export const db = globalForPrisma.prisma ?? new PrismaClient({ adapter });
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
-```
-
-> Verify adapter choice against the current Prisma + Neon docs before setup (`@prisma/adapter-pg` vs Neon's serverless adapter).
-
-### Seed: system item types
-
-| name | slug | icon | color | contentType | isProOnly |
-|---|---|---|---|---|---|
-| Snippet | snippets | Code | #3b82f6 | TEXT | false |
-| Prompt | prompts | Sparkles | #8b5cf6 | TEXT | false |
-| Command | commands | Terminal | #f97316 | TEXT | false |
-| Note | notes | StickyNote | #fde047 | TEXT | false |
-| Link | links | Link | #10b981 | URL | false |
-| File | files | File | #6b7280 | FILE | true |
-| Image | images | Image | #ec4899 | FILE | true |
-
-All seeded with `isSystem = true`, `userId = null`.
-
-### Database rules ⚠️
-
-- **Never** use `prisma db push` or modify the database structure directly.
-- Every schema change = a migration.
-  - Dev: `npx prisma migrate dev --name <change>`
-  - Prod: `npx prisma migrate deploy`
-- Migrations are committed to the repo.
 
 ---
 
-## 7. Routes
+## 🛠️ Tech Stack
 
-| Route | Purpose |
-|---|---|
-| `/` | Dashboard: collection cards grid + pinned/recent items |
-| `/items/[typeSlug]` | All items of a type (e.g. `/items/snippets`) |
-| `/collections` | All collections |
-| `/collections/[id]` | Items in a collection |
-| `/favorites` | Favorite items and collections |
-| `/settings` | Profile, billing, export |
-| `/pricing` | Plans |
-| `/sign-in`, `/sign-up` | Auth |
-| `/api/items`, `/api/collections`, `/api/uploads`, `/api/ai/*`, `/api/stripe/webhook` | Backend |
+### Architecture Diagram
 
-Item drawer state can live in the URL (e.g. `?item=<id>`) so drawers are linkable and survive refresh.
+```mermaid
+flowchart TB
+    subgraph Client["Client Layer"]
+        Browser["Browser"]
+        Mobile["Mobile Browser"]
+    end
+
+    subgraph NextJS["Next.js 16 Application"]
+        Pages["SSR Pages"]
+        Components["React 19 Components"]
+        API["API Routes"]
+    end
+
+    subgraph Services["External Services"]
+        Auth["NextAuth v5"]
+        AI["OpenAI gpt-5-nano"]
+        Storage["Cloudflare R2"]
+        Payments["Stripe"]
+    end
+
+    subgraph Database["Database Layer"]
+        Neon["Neon PostgreSQL"]
+        Prisma["Prisma 7 ORM"]
+    end
+
+    Browser --> NextJS
+    Mobile --> NextJS
+    Pages --> Components
+    Components --> API
+    API --> Auth
+    API --> AI
+    API --> Storage
+    API --> Payments
+    API --> Prisma
+    Prisma --> Neon
+```
+
+### Technology Choices
+
+| Category           | Technology                  | Notes                                  |
+| ------------------ | --------------------------- | -------------------------------------- |
+| **Framework**      | Next.js 16 / React 19       | SSR pages, API routes, single codebase |
+| **Language**       | TypeScript                  | Type safety throughout                 |
+| **Database**       | Neon PostgreSQL             | Serverless Postgres                    |
+| **ORM**            | Prisma 7                    | Latest version with full type safety   |
+| **File Storage**   | Cloudflare R2               | S3-compatible object storage           |
+| **Authentication** | NextAuth v5                 | Email/password + GitHub OAuth          |
+| **AI**             | OpenAI gpt-5-nano           | Cost-effective for AI features         |
+| **Styling**        | Tailwind CSS v4 + shadcn/ui | Modern, accessible components          |
+| **Payments**       | Stripe                      | Subscriptions & billing                |
+
+### Important Development Notes
+
+> ⚠️ **Database Migrations**
+>
+> **NEVER** use `prisma db push` or directly update the database structure.
+>
+> Always create migrations that run in development first, then production:
+>
+> ```bash
+> # Create migration
+> npx prisma migrate dev --name <migration_name>
+>
+> # Apply to production
+> npx prisma migrate deploy
+> ```
+
+### Recommended Links
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [NextAuth.js Documentation](https://authjs.dev)
+- [Tailwind CSS v4](https://tailwindcss.com/docs)
+- [shadcn/ui Components](https://ui.shadcn.com)
+- [Neon PostgreSQL](https://neon.tech/docs)
+- [Cloudflare R2](https://developers.cloudflare.com/r2)
+- [Stripe Subscriptions](https://stripe.com/docs/billing/subscriptions)
 
 ---
 
-## 8. Monetization
+## 💰 Monetization
 
-| | Free | Pro — $8/mo or $72/yr (25% off) |
-|---|---|---|
-| Items | 50 total | Unlimited |
-| Collections | 3 | Unlimited |
-| System types | All except File/Image | All |
-| File & image uploads | ❌ | ✅ |
-| Custom types | ❌ | ✅ 🔜 |
-| Search | Basic | Basic (advanced TBD) |
-| AI features | ❌ | Auto-tag, summaries, explain code, prompt optimizer |
-| Export (JSON/ZIP) | ❌ | ✅ |
-| Support | Standard | Priority |
+### Pricing Tiers
 
-### Gating foundation
+```mermaid
+flowchart LR
+    subgraph Free["Free Tier"]
+        F1["50 items total"]
+        F2["3 collections"]
+        F3["Basic types only"]
+        F4["Basic search"]
+        F5["No file uploads"]
+        F6["No AI features"]
+    end
 
-- Single source of truth for limits, e.g. `src/lib/plans.ts` (`FREE_LIMITS = { items: 50, collections: 3 }`).
-- One helper, e.g. `canUse(user, feature)`, called **server-side** in every Route Handler that creates items/collections, uploads files, calls AI, or exports.
-- During development, a flag like `ENFORCE_PLAN_LIMITS=false` makes every check pass, so all users get everything without touching the gating code later.
-- `isPro` is updated only by the Stripe webhook, never by the client.
+    subgraph Pro["Pro Tier - $8/mo or $72/yr"]
+        P1["Unlimited items"]
+        P2["Unlimited collections"]
+        P3["File & Image uploads"]
+        P4["Custom types (future)"]
+        P5["AI auto-tagging"]
+        P6["AI code explanation"]
+        P7["AI prompt optimizer"]
+        P8["Export (JSON/ZIP)"]
+        P9["Priority support"]
+    end
+```
+
+### Feature Comparison
+
+| Feature                                   | Free |      Pro       |
+| ----------------------------------------- | :--: | :------------: |
+| Items                                     |  50  |   Unlimited    |
+| Collections                               |  3   |   Unlimited    |
+| Snippets, Prompts, Commands, Notes, Links |  ✅  |       ✅       |
+| Files & Images                            |  ❌  |       ✅       |
+| Basic Search                              |  ✅  |       ✅       |
+| Custom Types                              |  ❌  | 🔜 Coming Soon |
+| AI Auto-tagging                           |  ❌  |       ✅       |
+| AI Code Explanation                       |  ❌  |       ✅       |
+| AI Prompt Optimizer                       |  ❌  |       ✅       |
+| Data Export                               |  ❌  |       ✅       |
+| Priority Support                          |  ❌  |       ✅       |
+
+> **Development Note:** During development, all users can access all features. Pro gating will be enabled before launch.
 
 ---
 
-## 9. UI / UX
+## 🎨 UI/UX Guidelines
 
-### General
-- Modern, minimal, developer-focused. References: Notion, Linear, Raycast.
-- Dark mode default, light mode optional.
-- Clean typography, generous whitespace, subtle borders and shadows.
-- Syntax highlighting for code blocks.
+### Design Principles
 
-### Layout
+- **Modern & Minimal** - Developer-focused aesthetic
+- **Dark Mode Default** - Light mode optional
+- **Clean Typography** - Generous whitespace
+- **Subtle Accents** - Borders and shadows used sparingly
+- **Syntax Highlighting** - For all code blocks
+
+### Design References
+
+- [Notion](https://notion.so) - Clean organization
+- [Linear](https://linear.app) - Modern dev aesthetic
+- [Raycast](https://raycast.com) - Quick access patterns
+
+### Screenshots
+
+Refer to the screenshots below as a base for the dashboard UI. It does not have to be exact. Use it as a reference:
+
+- @co
+- @context/screenshots/dashboard-ui-drawer.png
+
+### Layout Structure
 
 ```
-┌──────────────┬─────────────────────────────────────────┐
-│  Sidebar     │  Main                                   │
-│  (collapsible)│                                        │
-│              │  ┌────────┐ ┌────────┐ ┌────────┐       │
-│  Types       │  │ React  │ │ Python │ │Context │  ←    │
-│   • Snippets │  │Patterns│ │Snippets│ │ Files  │  collection cards
-│   • Prompts  │  └────────┘ └────────┘ └────────┘  (bg = dominant type color)
-│   • Commands │                                         │
-│   • Notes    │  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐    │
-│   • Links    │  │ item │ │ item │ │ item │ │ item │ ←  │
-│   • Files ⭐ │  └──────┘ └──────┘ └──────┘ └──────┘  item cards
-│   • Images ⭐│                                 (border = type color)
-│              │                                         │
-│  Collections │                      ┌─────────────────┐│
-│   (latest)   │                      │  Item drawer    ││
-│              │                      └─────────────────┘│
-└──────────────┴─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│  DevStash                                    🔍  ⚙️  👤     │
+├──────────────┬──────────────────────────────────────────────┤
+│              │                                              │
+│  TYPES       │  Collections                                 │
+│  ─────────   │  ┌────────┐ ┌────────┐ ┌────────┐           │
+│  📝 Snippets │  │ React  │ │ Python │ │Context │           │
+│  ✨ Prompts  │  │Patterns│ │Snippets│ │ Files  │           │
+│  ⌨️ Commands │  └────────┘ └────────┘ └────────┘           │
+│  📒 Notes    │                                              │
+│  📁 Files    │  Recent Items                                │
+│  🖼️ Images   │  ┌──────────────────────────────────────┐   │
+│  🔗 Links    │  │ 🔷 useAuth hook snippet              │   │
+│              │  ├──────────────────────────────────────┤   │
+│  ─────────   │  │ 🟣 Code review prompt                │   │
+│  COLLECTIONS │  ├──────────────────────────────────────┤   │
+│  React...    │  │ 🟠 git reset --hard HEAD~1           │   │
+│  Python...   │  └──────────────────────────────────────┘   │
+│              │                                              │
+└──────────────┴──────────────────────────────────────────────┘
 ```
 
-- Collection card background = color of the type it holds the most of (computed at query time; falls back to `defaultType`, then neutral).
-- Item card border = its type color.
-- Items open in a drawer.
+### Type Colors (CSS Variables)
 
-### Responsive
-- Desktop-first, usable on mobile.
-- Sidebar becomes a drawer on mobile.
+```css
+:root {
+  --color-snippet: #3b82f6; /* Blue */
+  --color-prompt: #8b5cf6; /* Purple */
+  --color-command: #f97316; /* Orange */
+  --color-note: #fde047; /* Yellow */
+  --color-file: #6b7280; /* Gray */
+  --color-image: #ec4899; /* Pink */
+  --color-link: #10b981; /* Emerald */
+}
+```
+
+### Icon Mapping (Lucide React)
+
+```typescript
+// lib/constants/item-types.ts
+
+import {
+  Code,
+  Sparkles,
+  Terminal,
+  StickyNote,
+  File,
+  Image,
+  Link,
+} from 'lucide-react';
+
+export const ITEM_TYPE_ICONS = {
+  snippet: Code,
+  prompt: Sparkles,
+  command: Terminal,
+  note: StickyNote,
+  file: File,
+  image: Image,
+  link: Link,
+} as const;
+
+export const ITEM_TYPE_COLORS = {
+  snippet: '#3b82f6',
+  prompt: '#8b5cf6',
+  command: '#f97316',
+  note: '#fde047',
+  file: '#6b7280',
+  image: '#ec4899',
+  link: '#10b981',
+} as const;
+```
+
+### Responsive Behavior
+
+| Viewport            | Sidebar                    | Layout                         |
+| ------------------- | -------------------------- | ------------------------------ |
+| Desktop (≥1024px)   | Visible, collapsible       | Full sidebar + main content    |
+| Tablet (768-1023px) | Drawer (hidden by default) | Full-width main content        |
+| Mobile (<768px)     | Drawer (hidden by default) | Stacked cards, simplified grid |
 
 ### Micro-interactions
-- Smooth transitions
-- Hover states on cards
-- Toast notifications for actions
-- Loading skeletons
+
+- **Transitions** - Smooth 150-200ms easing
+- **Hover States** - Subtle elevation on cards
+- **Toast Notifications** - For CRUD actions
+- **Loading States** - Skeleton placeholders
+- **Drawer Animations** - Slide-in for item editing
 
 ---
 
-## 10. Environment Variables
+## 📁 Suggested Project Structure
 
-| Variable | Used by |
-|---|---|
-| `DATABASE_URL` | App runtime (Neon pooled connection) |
-| `DIRECT_URL` | Prisma CLI / migrations (Neon direct connection) |
-| `AUTH_SECRET` | Auth.js |
-| `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET` | GitHub OAuth |
-| `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` | File storage |
-| `OPENAI_API_KEY` | AI features |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY` | Billing |
-| `ENFORCE_PLAN_LIMITS` | Plan gating toggle |
+```
+devstash/
+├── prisma/
+│   ├── schema.prisma
+│   ├── migrations/
+│   └── seed.ts
+├── src/
+│   ├── app/
+│   │   ├── (auth)/
+│   │   │   ├── login/
+│   │   │   └── register/
+│   │   ├── (dashboard)/
+│   │   │   ├── items/
+│   │   │   │   └── [type]/
+│   │   │   ├── collections/
+│   │   │   │   └── [id]/
+│   │   │   └── settings/
+│   │   ├── api/
+│   │   │   ├── items/
+│   │   │   ├── collections/
+│   │   │   ├── ai/
+│   │   │   ├── upload/
+│   │   │   └── webhooks/stripe/
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components/
+│   │   ├── ui/           # shadcn components
+│   │   ├── items/
+│   │   ├── collections/
+│   │   ├── layout/
+│   │   └── shared/
+│   ├── lib/
+│   │   ├── prisma.ts
+│   │   ├── auth.ts
+│   │   ├── stripe.ts
+│   │   ├── openai.ts
+│   │   ├── r2.ts
+│   │   └── constants/
+│   ├── hooks/
+│   ├── types/
+│   └── styles/
+│       └── globals.css
+├── public/
+├── .env.example
+├── next.config.ts
+├── tailwind.config.ts
+├── tsconfig.json
+└── package.json
+```
 
 ---
 
-## 11. Changes From the Original Notes
+## 🚀 Next Steps
 
-| Original | Changed to | Why |
-|---|---|---|
-| `contentType (text \| file)` on Item | `ContentType` enum (`TEXT`, `URL`, `FILE`) on **ItemType** | Links are a third kind. The type defines the content kind; storing it on every item duplicates data and can drift. Custom types will need it at type level anyway. |
-| `fileUrl` (R2 URL) | `fileKey` + `mimeType` | Store the object key, generate presigned GET URLs on demand. Keeps the bucket private and survives domain/bucket changes. |
-| Tag with only `id`, `name` | Tag scoped per user, unique `[userId, name]` | Otherwise users share one global tag namespace. |
-| No field for "Recently used" | `Item.lastUsedAt` | The feature needs something to sort by. |
-| ItemType without slug | `slug` field | Needed for `/items/snippets`-style routes. |
-| No pro flag on types | `ItemType.isProOnly` | Drives File/Image gating from data, not hardcoded checks. |
-| User without password | `User.passwordHash` | Required for email/password sign-in. |
-| "GitHu gists" | GitHub Gists | Typo. |
+1. [ ] Initialize Next.js 16 project with TypeScript
+2. [ ] Set up Prisma with Neon PostgreSQL
+3. [ ] Configure NextAuth v5 (email + GitHub)
+4. [ ] Create database migrations for initial schema
+5. [ ] Seed system item types
+6. [ ] Build core UI components with shadcn/ui
+7. [ ] Implement items CRUD
+8. [ ] Implement collections CRUD
+9. [ ] Add search functionality
+10. [ ] Set up Cloudflare R2 for file uploads
+11. [ ] Integrate Stripe for subscriptions
+12. [ ] Add AI features (OpenAI integration)
+13. [ ] Implement usage limits for free tier
+14. [ ] Testing & polish
+15. [ ] Deploy to production
 
 ---
 
-## 12. Open Questions
-
-1. **Session strategy.** Auth.js's Credentials provider only works with JWT sessions, not database sessions. With email/password in scope, plan on `session: { strategy: "jwt" }`. The `Session` table stays for the adapter but will be mostly unused.
-2. **System type uniqueness.** `@@unique([userId, slug])` does not protect system types, because PostgreSQL treats `NULL`s as distinct. Fine as long as system types are only created by the seed script; revisit when custom types ship.
-3. **Search implementation.** "Powerful search" is undefined. Options: Postgres full-text search (`tsvector`) for content, `pg_trgm` for fuzzy title matches. Decide what Free "basic" vs Pro means, or drop the distinction.
-4. **Free-tier downgrade.** What happens when a Pro user with 200 items and uploaded files cancels? (Read-only over limit? Hide files?) Needs a rule before Stripe goes live.
-5. **AI cost controls.** Pro is unlimited on AI features at $8/month. Consider a per-user monthly cap or rate limit.
-6. **File size limit.** Not defined. Set a max per file and a total storage quota for Pro.
-7. **Redis.** Skip until there's a measured need.
-8. **Yellow notes (`#fde047`)** have poor contrast as text or borders in light mode. May need a darker variant for light theme.
+_Last updated: January 2025_
