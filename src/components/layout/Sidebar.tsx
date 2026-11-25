@@ -12,25 +12,12 @@ import {
   ITEM_TYPE_STYLES,
   type ItemTypeName,
 } from "@/lib/constants/item-types";
-import { collections, currentUser, items, itemTypes } from "@/lib/mock-data";
+import { getRecentCollections } from "@/lib/collections";
+import { collections, currentUser, itemTypes } from "@/lib/mock-data";
 import type { MockCollection } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 const RECENT_COLLECTIONS_LIMIT = 4;
-
-function getRecentCollections(): MockCollection[] {
-  const lastUpdated = (collectionId: string) =>
-    Math.max(
-      0,
-      ...items
-        .filter((item) => item.collectionIds.includes(collectionId))
-        .map((item) => Date.parse(item.updatedAt)),
-    );
-
-  return [...collections]
-    .sort((a, b) => lastUpdated(b.id) - lastUpdated(a.id))
-    .slice(0, RECENT_COLLECTIONS_LIMIT);
-}
 
 function getInitials(name: string): string {
   return name
@@ -107,7 +94,7 @@ interface SidebarContentProps {
 function SidebarContent({ collapsed, onNavigate }: SidebarContentProps) {
   const pathname = usePathname();
   const favoriteCollections = collections.filter((collection) => collection.isFavorite);
-  const recentCollections = getRecentCollections();
+  const recentCollections = getRecentCollections(RECENT_COLLECTIONS_LIMIT);
 
   const renderCollection = (collection: MockCollection) => (
     <SidebarLink

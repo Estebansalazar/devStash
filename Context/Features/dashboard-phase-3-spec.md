@@ -11,6 +11,7 @@ This is phase 3 of 3 for the dashboard UI layout. Use the screenshot referenced 
 - Pinned Items
 - 10 Recent items
 - 4 stats cards at the top for number of items, collections, favorite items and favorite collections (Not in screenshot)
+- Theme toggle in the top bar to switch between dark and light theme (Not in screenshot): sun icon in dark mode, moon icon in light mode. Dark stays the default and the choice is remembered
 
 ## References
 

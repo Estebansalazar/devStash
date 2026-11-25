@@ -1,12 +1,37 @@
+import { Folder, Package, Pin, Star } from "lucide-react";
+
 import { CollectionCard } from "@/components/dashboard/CollectionCard";
 import { ItemCard } from "@/components/dashboard/ItemCard";
+import { StatCard } from "@/components/dashboard/StatCard";
 import type { ItemTypeName } from "@/lib/constants/item-types";
+import { getRecentCollections } from "@/lib/collections";
 import { collections, items, itemTypes } from "@/lib/mock-data";
+import type { MockItem } from "@/lib/mock-data";
+
+const RECENT_COLLECTIONS_LIMIT = 4;
+const RECENT_ITEMS_LIMIT = 10;
 
 const typeById = new Map(itemTypes.map((type) => [type.id, type]));
 
+function renderItemCard(item: MockItem) {
+  const type = typeById.get(item.itemTypeId);
+  return (
+    <ItemCard
+      key={item.id}
+      item={item}
+      typeName={type?.name as ItemTypeName}
+      typeLabel={type?.label.slice(0, -1) ?? ""}
+    />
+  );
+}
+
 export default function DashboardPage() {
-  const recentItems = items.slice(0, 3);
+  const totalItems = itemTypes.reduce((sum, type) => sum + type.count, 0);
+  const recentCollections = getRecentCollections(RECENT_COLLECTIONS_LIMIT);
+  const pinnedItems = items.filter((item) => item.isPinned);
+  const recentItems = [...items]
+    .sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt))
+    .slice(0, RECENT_ITEMS_LIMIT);
 
   return (
     <div className="flex flex-col gap-10">
@@ -17,10 +42,25 @@ export default function DashboardPage() {
         </p>
       </div>
 
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard label="Items" value={totalItems} icon={Package} />
+        <StatCard label="Collections" value={collections.length} icon={Folder} />
+        <StatCard
+          label="Favorite items"
+          value={items.filter((item) => item.isFavorite).length}
+          icon={Star}
+        />
+        <StatCard
+          label="Favorite collections"
+          value={collections.filter((collection) => collection.isFavorite).length}
+          icon={Star}
+        />
+      </section>
+
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold">Collections</h2>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {collections.map((collection) => (
+          {recentCollections.map((collection) => (
             <CollectionCard
               key={collection.id}
               collection={collection}
@@ -32,20 +72,25 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      {pinnedItems.length > 0 && (
+        <section className="flex flex-col gap-4">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            <Pin className="size-4 text-muted-foreground" />
+            Pinned
+            <span className="text-sm font-normal text-muted-foreground">
+              {pinnedItems.length}
+            </span>
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {pinnedItems.map(renderItemCard)}
+          </div>
+        </section>
+      )}
+
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold">Recent</h2>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {recentItems.map((item) => {
-            const type = typeById.get(item.itemTypeId);
-            return (
-              <ItemCard
-                key={item.id}
-                item={item}
-                typeName={type?.name as ItemTypeName}
-                typeLabel={type?.label.slice(0, -1) ?? ""}
-              />
-            );
-          })}
+          {recentItems.map(renderItemCard)}
         </div>
       </section>
     </div>
