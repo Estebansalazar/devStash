@@ -584,10 +584,12 @@ flowchart LR
 
 ### Screenshots
 
-Refer to the screenshots below as a base for the dashboard UI. It does not have to be exact. Use it as a reference:
+Refer to the screenshots below as a base for the dashboard UI. It does not have to be exact, but needs to be very similar. Use it as a reference:
 
-- @co
-- @context/screenshots/dashboard-ui-drawer.png
+- @Context/Screenshots/Devdash-dark.png
+- @Context/Screenshots/Devdash-White.png
+- @Context/Screenshots/DevStash · Mobile (1).png
+
 
 ### Layout Structure
 
@@ -707,6 +709,7 @@ devstash/
 │   │   │   ├── ai/
 │   │   │   ├── upload/
 │   │   │   └── webhooks/stripe/
+│   │   ├── globals.css   # Tailwind v4 theme (no tailwind.config)
 │   │   ├── layout.tsx
 │   │   └── page.tsx
 │   ├── components/
@@ -723,13 +726,10 @@ devstash/
 │   │   ├── r2.ts
 │   │   └── constants/
 │   ├── hooks/
-│   ├── types/
-│   └── styles/
-│       └── globals.css
+│   └── types/
 ├── public/
 ├── .env.example
 ├── next.config.ts
-├── tailwind.config.ts
 ├── tsconfig.json
 └── package.json
 ```
@@ -756,4 +756,4 @@ devstash/
 
 ---
 
-_Last updated: January 2025_
+_Last updated: November 2026_

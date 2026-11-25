@@ -1,3 +1,14 @@
+# DevStash
+
+A unified hub for developer knowledge & resources.
+
+## How we work with AI
+
+- Written rules: [Context/ai-interaction.md](Context/ai-interaction.md) and [CLAUDE.md](CLAUDE.md)
+- Visual explanation: [docs/ai-workflow.excalidraw](docs/ai-workflow.excalidraw), a snapshot from Dashboard Phase 1. Open it at [excalidraw.com](https://excalidraw.com) or with the VS Code Excalidraw extension.
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

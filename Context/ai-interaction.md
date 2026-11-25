@@ -12,29 +12,46 @@
 
 This is the common workflow that we will use for every single feature/fix:
 
-1. **Document** - Document the feature in @context/current-feature.md.
+0. **Spec** - Write the feature spec in `Context/Features/` (Overview, Requirements, References).
+1. **Document** - Document the feature in @Context/current-feature.md.
 2. **Branch** - Create new branch for feature, fix, etc
-3. **Implement** - Implement the feature/fix that I create in @context/current-feature.md
+3. **Implement** - Implement the feature/fix that I create in @Context/current-feature.md
 4. **Test** - Verify it works in the browser. Implement unit testing later. Run `npm run build` and fix any errors
 5. **Iterate** - Iterate and change things if needed
 6. **Commit** - Only after build passes and everything works
-7. **Merge** - Merge to main
+7. **Merge** - Push the branch and merge to main (open a PR if working with a team)
 8. **Delete Branch** - Delete branch after merge
 9. **Review** - Review AI-generated code periodically and on demand.
-10. Mark as completed in @context/current-feature.md and add to history
+10. **Complete** - In @Context/current-feature.md set Status to "Completed" with a list of what was done, keep Goals and Notes, and add a one-line summary to History.
+
+```mermaid
+flowchart TD
+    S[0. Spec] --> D[1. Document] --> B[2. Branch] --> I[3. Implement] --> T[4. Test]
+    T -->|doesn't work| IT[5. Iterate] --> T
+    T -->|works| C[6. Commit] --> M[7. Merge] --> DB[8. Delete branch] --> DONE[10. Complete]
+    DONE -.-> R[9. Review periodically]
+```
+
+Visual explanation for humans: `docs/ai-workflow.excalidraw` (a snapshot from Dashboard Phase 1).
 
 Do NOT commit without permission and until the build passes. If build fails, fix the issues first.
 
 ## Branching
 
-We will create a new branch for every feature/fix. Name branch **feature/[feature]** or **fix[fix]**, etc. Ask to delete the branch once merged.
+We will create a new branch for every feature/fix. Name branch **feature/[feature]** or **fix/[fix]**, etc. Ask to delete the branch once merged.
 
 ## Commits
 
 - Ask before committing (don't auto-commit)
 - Use conventional commit messages (feat:, fix:, chore:, etc.)
 - Keep commits focused (one feature/fix per commit)
-- Never put "Generated With Claude" in the commit messages
+- Never add AI attribution to commits: no "Generated With Claude" and no `Co-Authored-By` lines
+
+## Sources of Truth
+
+- If the spec and the screenshot disagree, the spec wins
+- Screenshots define the look: layout can be approximate, but colors must match exactly
+- Keep the Context files up to date: outdated docs are worse than no docs, because the AI trusts them
 
 ## When Stuck
 
