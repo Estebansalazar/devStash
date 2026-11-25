@@ -26,7 +26,7 @@ read the following to get the full context of the project
 
 ## Next.js version caveat
 
-This is Next.js 16.4.4 with React 19.3 and has breaking changes versus older Next.js. Per `AGENTS.md`, read the relevant guide in `node_modules/next/dist/docs/` (e.g. `01-app/03-api-reference/03-file-conventions/`) before writing code, and heed deprecation notices.
+This is Next.js 16.4.6 with React 19.3 and has breaking changes versus older Next.js. Per `AGENTS.md`, read the relevant guide in `node_modules/next/dist/docs/` (e.g. `01-app/03-api-reference/03-file-conventions/`) before writing code, and heed deprecation notices.
 
 ## Architecture
 
