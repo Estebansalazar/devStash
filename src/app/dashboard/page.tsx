@@ -1,14 +1,20 @@
-import { Folder, Package, Pin, Star } from "lucide-react";
+import { Suspense } from "react";
+import { Package, Pin, Star } from "lucide-react";
 
-import { CollectionCard } from "@/components/dashboard/CollectionCard";
+import {
+  CollectionStatCards,
+  CollectionStatCardsSkeleton,
+} from "@/components/dashboard/CollectionStatCards";
 import { ItemCard } from "@/components/dashboard/ItemCard";
+import {
+  RecentCollections,
+  RecentCollectionsSkeleton,
+} from "@/components/dashboard/RecentCollections";
 import { StatCard } from "@/components/dashboard/StatCard";
 import type { ItemTypeName } from "@/lib/constants/item-types";
-import { getRecentCollections } from "@/lib/collections";
-import { collections, items, itemTypes } from "@/lib/mock-data";
+import { items, itemTypes } from "@/lib/mock-data";
 import type { MockItem } from "@/lib/mock-data";
 
-const RECENT_COLLECTIONS_LIMIT = 4;
 const RECENT_ITEMS_LIMIT = 10;
 
 const typeById = new Map(itemTypes.map((type) => [type.id, type]));
@@ -27,7 +33,6 @@ function renderItemCard(item: MockItem) {
 
 export default function DashboardPage() {
   const totalItems = itemTypes.reduce((sum, type) => sum + type.count, 0);
-  const recentCollections = getRecentCollections(RECENT_COLLECTIONS_LIMIT);
   const pinnedItems = items.filter((item) => item.isPinned);
   const recentItems = [...items]
     .sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt))
@@ -44,32 +49,21 @@ export default function DashboardPage() {
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Items" value={totalItems} icon={Package} />
-        <StatCard label="Collections" value={collections.length} icon={Folder} />
         <StatCard
           label="Favorite items"
           value={items.filter((item) => item.isFavorite).length}
           icon={Star}
         />
-        <StatCard
-          label="Favorite collections"
-          value={collections.filter((collection) => collection.isFavorite).length}
-          icon={Star}
-        />
+        <Suspense fallback={<CollectionStatCardsSkeleton />}>
+          <CollectionStatCards />
+        </Suspense>
       </section>
 
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold">Collections</h2>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {recentCollections.map((collection) => (
-            <CollectionCard
-              key={collection.id}
-              collection={collection}
-              typeNames={collection.typeIds.map(
-                (id) => typeById.get(id)?.name as ItemTypeName,
-              )}
-            />
-          ))}
-        </div>
+        <Suspense fallback={<RecentCollectionsSkeleton />}>
+          <RecentCollections />
+        </Suspense>
       </section>
 
       {pinnedItems.length > 0 && (

@@ -1,19 +1,15 @@
 import { Folder, Star } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import {
-  ITEM_TYPE_ICONS,
-  ITEM_TYPE_STYLES,
-  type ItemTypeName,
-} from "@/lib/constants/item-types";
-import type { MockCollection } from "@/lib/mock-data";
+import { ITEM_TYPE_ICONS, ITEM_TYPE_STYLES } from "@/lib/constants/item-types";
+import type { CollectionCardData } from "@/lib/db/collections";
 
 interface CollectionCardProps {
-  collection: MockCollection;
-  typeNames: ItemTypeName[];
+  collection: CollectionCardData;
 }
 
-export function CollectionCard({ collection, typeNames }: CollectionCardProps) {
+export function CollectionCard({ collection }: CollectionCardProps) {
+  const { typeNames } = collection;
   const main = ITEM_TYPE_STYLES[typeNames[0] ?? "file"];
 
   return (
