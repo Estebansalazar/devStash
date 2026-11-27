@@ -1,10 +1,70 @@
 ## Current Feature
 
-Seed sample data
+Dashboard collections from the database
 
 ## Status
 
 Not started
+
+## Change Log
+
+### 2026-11-27 — Feature documented
+
+- Spec written in `Context/Features/dashboard-collections-spec.md`; feature added here, nothing implemented yet
+
+### 2026-11-27 — Implemented on `feature/dashboard-collections`
+
+- Added `src/lib/db/collections.ts`: `getRecentCollections(limit)` and `getCollectionStats()`, both scoped to the seeded demo user (`demo@devstash.io`) through a `DEMO_USER_EMAIL` constant, since there is no auth yet
+- Collections are ordered by the last update of any item in them, falling back to the collection's own `updatedAt` when it has no items (Prisma cannot order by a related max, so the sort is done in JS after one query)
+- `typeNamesByUsage()` counts the item types in a collection and returns them most-used first, so the card border is the most-used type and the icon row shows every type present; ties break alphabetically
+- Unknown type names coming from the database are filtered out against `ITEM_TYPE_ICONS` instead of being cast, so no `any` and no crash on a custom type later
+- `CollectionCard` now takes a single `collection: CollectionCardData` prop instead of `MockCollection` + a separate `typeNames` array; the markup and classes are unchanged
+- New `RecentCollections` and `CollectionStatCards` server components, each with a skeleton fallback, plus an empty state on the collections grid
+- `cacheComponents: true` makes database reads dynamic, so both are wrapped in `<Suspense>`; `/dashboard` now builds as `◐ Partial Prerender` (static shell, collections streamed in)
+- Limit raised from 4 to 6 cards per the spec; the database has 5 collections, so all 5 show
+- Stats cards: "Collections" and "Favorite collections" now come from the database; "Items" and "Favorite items" still read mock data, since items are a later feature
+- The sidebar and `src/lib/collections.ts` still use mock data and are untouched
+- Verified against the Neon dev branch: 5 collections, counts 4/4/4/3/3, DevOps gets the `link` border (link 2, command 1, snippet 1), stats show 5 collections and 0 favorites
+- `tsc --noEmit`, `eslint` and `npm run build` all pass
+- Not committed yet
+
+### 2026-11-27 — Project history diagram updated
+
+- `docs/project-history.excalidraw` refreshed for the seed and dashboard-collections work: 35 panels now, up from 33
+- Two new timeline panels: "7 · Datos de ejemplo (el seed)" (merged `276cccf`) and "8 · Las colecciones, desde la base" marked `← ACÁ ESTAMOS`; panel 6 lost that marker and now records the `82ccf33` merge
+- The map panel's "pieza desconectada" note is gone: `src/lib/prisma.ts` has its first importer, and mock-data is down to 4 importers (read from the repo, not written by hand)
+- "Qué falta", "El viaje de un dato" (no longer hypothetical) and the verbatim prompts panel were updated; the three new prompts carry real timestamps from the Claude Code transcripts
+- The generator script from the earlier session no longer exists in the repo, so the file was edited as JSON with a reflow pass that keeps the original gaps between panels; verified afterwards with no overlaps and no text spilling outside its panel
+- `*.excalidraw` is gitignored, so this file stays local and is not part of the commit
+
+## Goals
+
+- Replace the mock collection data in the main area of the dashboard (right side) with real data from the Neon database through Prisma
+- Keep the current look: the 6 recent collection cards, same design
+- Create `src/lib/db/collections.ts` with the data fetching functions
+- Fetch the collections directly in the server component (no API route, no Server Action)
+- Collection card border color comes from the most-used content type in that collection
+- Show small icons of all the types present in that collection
+- Update the collection stats display
+- Do not add the items underneath yet; that is a later feature
+
+## Notes
+
+- Spec: @Context/Features/dashboard-collections-spec.md
+- Screenshot: @Context/Screenshots/Devdash-dark.png (the spec names `dashboard-ui-main.png` under `context/screenshots/`, which does not match the real paths; layout and design already exist, so the screenshot is only a reference)
+- Data comes from the demo user's seeded collections (5 collections, 18 items) on the Neon **development** branch
+- `src/lib/prisma.ts` exists but nothing imports it yet; this is the first place the dashboard reads from the database
+- Only the main-area collections change; the sidebar, stats cards, pinned items and recent items still read `src/lib/mock-data.ts` unless the spec says otherwise ("Update collection stats display" is the one open point to settle while implementing)
+
+-----
+
+## Previous Feature
+
+Seed sample data
+
+## Status
+
+Completed (2026-11-27) — merged to main (`276cccf`, from `feature/seed`)
 
 ## Change Log
 
@@ -28,6 +88,12 @@ Not started
 - Expected counts are written from the spec, not imported from `prisma/seed-data.ts`, so the test catches a wrong seed instead of copying it
 - The demo checks are skipped if the demo user is missing, and that counts as a failure
 - All checks pass; the run also confirms `.env` points at the dev endpoint `ep-frosty-smoke-ben5c4d2`
+
+### 2026-11-27 — Completed
+
+- Merged to main (`276cccf`, from `feature/seed`)
+- Done: demo user, 5 collections and 18 items seeded idempotently, plus demo data checks in `npm run db:test`
+- Superseded as current feature by "Dashboard collections from the database"
 
 ## Goals
 
@@ -234,3 +300,4 @@ Completed
 - Dashboard UI Phase 2 (completed): collapsible sidebar with item type links, favorite and recent collections, user avatar area, and a drawer on mobile
 - Dashboard UI Phase 3 (completed): stats cards, recent collections, pinned items, 10 recent items and a dark/light theme toggle
 - Prisma + Neon PostgreSQL setup (completed): Prisma 7 with the pg adapter, full schema with NextAuth models, init migration on the Neon dev branch, 7 system item types seeded and a database test script
+- Seed sample data (completed): demo user, 5 collections and 18 items seeded idempotently with bcryptjs, plus demo data checks in the database test script
