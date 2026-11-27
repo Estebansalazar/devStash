@@ -1,4 +1,5 @@
 import "dotenv/config";
+import bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
@@ -14,6 +15,18 @@ const EXPECTED_SYSTEM_TYPES = [
   "image",
   "link",
 ];
+
+const DEMO_EMAIL = "demo@devstash.io";
+const DEMO_PASSWORD = "12345678";
+
+/** Item types per demo collection, as defined in Context/Features/seed-spec.md. */
+const EXPECTED_DEMO_COLLECTIONS: Record<string, Record<string, number>> = {
+  "React Patterns": { snippet: 3 },
+  "AI Workflows": { prompt: 3 },
+  DevOps: { snippet: 1, command: 1, link: 2 },
+  "Terminal Commands": { command: 4 },
+  "Design Resources": { link: 4 },
+};
 
 /** Thrown to roll back the write test so it leaves no rows behind. */
 class RollbackSignal extends Error {}
@@ -107,6 +120,61 @@ async function testCounts() {
   check("all tables readable", true, "every model responded to count()");
 }
 
+async function testDemoUser() {
+  console.log("\n--- Demo user ---");
+
+  const user = await prisma.user.findUnique({ where: { email: DEMO_EMAIL } });
+  if (!user) {
+    check("demo user", false, `${DEMO_EMAIL} not found — run 'npx prisma db seed'`);
+    return null;
+  }
+
+  check("demo user", true, `${user.name} <${user.email}>`);
+  check("  isPro", user.isPro === false, String(user.isPro));
+  check("  emailVerified", user.emailVerified !== null, String(user.emailVerified));
+
+  const rounds = user.password ? bcrypt.getRounds(user.password) : 0;
+  const matches = user.password ? await bcrypt.compare(DEMO_PASSWORD, user.password) : false;
+  check("  password hash", matches && rounds === 12, `matches: ${matches}, rounds: ${rounds}`);
+
+  return user.id;
+}
+
+async function testDemoCollections(userId: string) {
+  console.log("\n--- Demo collections ---");
+
+  const collections = await prisma.collection.findMany({
+    where: { userId },
+    orderBy: { createdAt: "asc" },
+    include: { items: { include: { item: { include: { itemType: true } } } } },
+  });
+
+  const expectedNames = Object.keys(EXPECTED_DEMO_COLLECTIONS);
+  check("collections", collections.length === expectedNames.length, `${collections.length} found`);
+
+  for (const name of expectedNames) {
+    const collection = collections.find((c) => c.name === name);
+    if (!collection) {
+      check(`  ${name}`, false, "missing");
+      continue;
+    }
+
+    const counts: Record<string, number> = {};
+    for (const { item } of collection.items) {
+      counts[item.itemType.name] = (counts[item.itemType.name] ?? 0) + 1;
+    }
+
+    const expected = EXPECTED_DEMO_COLLECTIONS[name];
+    const types = new Set([...Object.keys(counts), ...Object.keys(expected)]);
+    const ok = [...types].every((type) => counts[type] === expected[type]);
+    check(`  ${name}`, ok, `${collection.items.length} items ${JSON.stringify(counts)}`);
+
+    for (const { item } of collection.items) {
+      console.log(`      [${item.itemType.name}] ${item.title}${item.url ? ` — ${item.url}` : ""}`);
+    }
+  }
+}
+
 /**
  * Exercises writes, relations and cascade deletes inside a transaction that is
  * always rolled back, so the dev database is left exactly as it was found.
@@ -180,6 +248,10 @@ async function main() {
   await testMigrations();
   await testSeed();
   await testCounts();
+
+  const demoUserId = await testDemoUser();
+  if (demoUserId) await testDemoCollections(demoUserId);
+
   await testWriteRoundTrip();
 
   console.log(
