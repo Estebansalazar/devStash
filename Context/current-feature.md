@@ -1,10 +1,66 @@
 ## Current Feature
 
+Seed sample data
+
+## Status
+
+Not started
+
+## Change Log
+
+### 2026-11-27 — Feature documented
+
+- Spec written in `Context/Features/seed-spec.md`; feature added here, nothing implemented yet
+
+### 2026-11-27 — Implemented on `feature/seed`
+
+- Installed `bcryptjs` 3 (ships its own types, no `@types` package needed)
+- Added `prisma/seed-data.ts` with the demo user, the 5 collections and their 18 items (real URLs for the 6 links), kept apart from the seed logic so `seed.ts` stays short
+- `prisma/seed.ts` now seeds the system types, then upserts the demo user (password hashed with 12 rounds) and recreates the demo user's collections and items, linking each item through `ItemCollection`
+- Idempotent: the demo user's items and collections are deleted and recreated on every run, so a second `npx prisma db seed` leaves the same counts
+- Ran the seed twice on the Neon dev branch: 1 user, 7 types, 5 collections, 18 items, 18 collection links; the stored hash verifies against `12345678`
+- `tsc --noEmit`, `eslint`, `npm run build` and `npm run db:test` all pass
+- Not committed yet
+
+### 2026-11-27 — Demo data checks in `scripts/test-db.ts`
+
+- Two new sections in `npm run db:test`: "Demo user" (exists, `isPro` false, `emailVerified` set, password matches `12345678` with 12 bcrypt rounds) and "Demo collections" (5 collections with the item types per collection from the spec, each item printed with its type and URL)
+- Expected counts are written from the spec, not imported from `prisma/seed-data.ts`, so the test catches a wrong seed instead of copying it
+- The demo checks are skipped if the demo user is missing, and that counts as a failure
+- All checks pass; the run also confirms `.env` points at the dev endpoint `ep-frosty-smoke-ben5c4d2`
+
+## Goals
+
+- Extend `prisma/seed.ts` to add a demo user, 5 collections and 18 items on top of the 7 system item types it already seeds
+- Demo user: `demo@devstash.io`, name "Demo User", password `12345678` hashed with bcryptjs (12 rounds), `isPro: false`, `emailVerified` set to the seed date
+- Collections and items, all owned by the demo user:
+  - **React Patterns** ("Reusable React patterns and hooks"): 3 TypeScript snippets covering custom hooks (useDebounce, useLocalStorage), component patterns (context providers, compound components) and utility functions
+  - **AI Workflows** ("AI prompts and workflow automations"): 3 prompts for code review, documentation generation and refactoring help
+  - **DevOps** ("Infrastructure and deployment resources"): 1 snippet (Docker or CI/CD config), 1 command (deployment script) and 2 links to real documentation URLs
+  - **Terminal Commands** ("Useful shell commands for everyday development"): 4 commands for git, Docker, process management and package managers
+  - **Design Resources** ("UI/UX resources and references"): 4 links to real URLs for CSS/Tailwind references, component libraries, design systems and icon libraries
+- Seed can be run more than once without creating duplicates
+
+## Notes
+
+- Spec: @Context/Features/seed-spec.md
+- The system item types are already seeded by the existing `prisma/seed.ts`; keep that part and add the rest after it
+- `bcryptjs` is not installed yet; it needs to be added as a dependency
+- Items link to collections through the `ItemCollection` join table, and each item needs the right `contentType` (`TEXT` for snippets, prompts and commands, `URL` for links) plus `language` on snippets
+- Run with `npx prisma db seed` against the Neon **development** branch only (on 25 Nov the production credentials ended up in `.env` by mistake, so check the host first)
+- The dashboard still reads `src/lib/mock-data.ts`; switching it to the database is a separate feature
+
+-----
+
+## Previous Feature
+
 Prisma + Neon PostgreSQL setup
 
 ## Status
 
 In progress — schema and seed are live on the Neon dev branch
+
+Completed (2026-11-27) — see the last Change Log entry
 
 ## Change Log
 
@@ -65,6 +121,13 @@ In progress — schema and seed are live on the Neon dev branch
 - Rewritten again for a reader with no programming background: a third column, "DESDE CERO", with 7 panels explaining the fundamentals behind everything else in the diagram, each term tied to where it appears in this project and most carrying an everyday analogy
 - Covers: computer vs server, package/npm/node_modules, what a database is (table, row, column, primary key, foreign key, 1:N and N:M, index, cascade, SQL), the Prisma vocabulary (ORM, schema, migration, seed, client, adapter), the 4 layers of a connection (DNS, TCP port, TLS, auth) mapped onto the 27 Nov failure, git (commit, branch, merge, PR, push, tracked), React/Next (component, props, state, server vs client, folder routing, TypeScript, Tailwind, shadcn), and dev vs prod with why secrets live in `.env`
 - Now 33 panels, ~6,600 words, 3540 x 9300 px, in three columns
+
+### 2026-11-27 — Completed
+
+- Merged to main (`82ccf33`, from `feature/database`)
+- Done: Prisma 7 with the `PrismaPg` adapter, full schema including the NextAuth models, indexes and cascade deletes, the `init` migration applied to the Neon dev branch, the 7 system item types seeded, `DIRECT_URL` support for migrations, and `scripts/test-db.ts` (`npm run db:test`)
+- Left open: `DIRECT_URL` is still not saved permanently in `.env`
+- Superseded as current feature by "Seed sample data"
 
 ## Goals
 
@@ -170,3 +233,4 @@ Completed
 - Dashboard UI Phase 1 (completed): ShadCN set up, /dashboard route in dark mode with the exact screenshot colors, top bar with search and New Item button, sidebar placeholder, and example collections and recent items from mock data
 - Dashboard UI Phase 2 (completed): collapsible sidebar with item type links, favorite and recent collections, user avatar area, and a drawer on mobile
 - Dashboard UI Phase 3 (completed): stats cards, recent collections, pinned items, 10 recent items and a dark/light theme toggle
+- Prisma + Neon PostgreSQL setup (completed): Prisma 7 with the pg adapter, full schema with NextAuth models, init migration on the Neon dev branch, 7 system item types seeded and a database test script

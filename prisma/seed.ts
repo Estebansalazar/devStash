@@ -1,6 +1,8 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
+import bcrypt from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { BCRYPT_ROUNDS, DEMO_USER, SEED_COLLECTIONS } from "./seed-data";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
@@ -34,6 +36,55 @@ async function main() {
   }
 
   console.log(`Seeded ${SYSTEM_ITEM_TYPES.length} system item types.`);
+
+  const userId = await seedDemoUser();
+  await seedCollections(userId);
+}
+
+async function seedDemoUser() {
+  console.log("Seeding demo user...");
+
+  const password = await bcrypt.hash(DEMO_USER.password, BCRYPT_ROUNDS);
+  const data = { name: DEMO_USER.name, password, isPro: false, emailVerified: new Date() };
+
+  const user = await prisma.user.upsert({
+    where: { email: DEMO_USER.email },
+    update: data,
+    create: { email: DEMO_USER.email, ...data },
+  });
+
+  console.log(`Seeded demo user ${user.email}.`);
+  return user.id;
+}
+
+async function seedCollections(userId: string) {
+  console.log("Seeding collections and items...");
+
+  // Demo data is recreated on every run so the seed stays idempotent.
+  await prisma.item.deleteMany({ where: { userId } });
+  await prisma.collection.deleteMany({ where: { userId } });
+
+  const systemTypes = await prisma.itemType.findMany({ where: { isSystem: true, userId: null } });
+  const typeIds = new Map(systemTypes.map((type) => [type.name, type.id]));
+
+  let itemCount = 0;
+  for (const collection of SEED_COLLECTIONS) {
+    const created = await prisma.collection.create({
+      data: { name: collection.name, description: collection.description, userId },
+    });
+
+    for (const { type, ...item } of collection.items) {
+      const itemTypeId = typeIds.get(type);
+      if (!itemTypeId) throw new Error(`System item type "${type}" not found`);
+
+      await prisma.item.create({
+        data: { ...item, userId, itemTypeId, collections: { create: { collectionId: created.id } } },
+      });
+      itemCount++;
+    }
+  }
+
+  console.log(`Seeded ${SEED_COLLECTIONS.length} collections and ${itemCount} items.`);
 }
 
 main()
